@@ -3,6 +3,8 @@ import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 
+import { ThemeProvider } from 'styled-components';
+
 import Animated, {
   Easing,
   Extrapolate,
@@ -16,11 +18,15 @@ import Animated, {
 
 import { interpolatePath, parse } from 'react-native-redash';
 import Svg, { Path } from 'react-native-svg';
+
 import {
   HandlerStateChangeEvent,
   TapGestureHandler,
   TapGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
+import { darkThemeVariables } from './src/theme/dark';
+import { Post } from './src/components/Post';
+import { lightThemeVariables } from './src/theme/light';
 
 const { width } = Dimensions.get('screen');
 
@@ -106,21 +112,25 @@ export default function App() {
   });
 
   return (
-    <View style={styles.container}>
-      <Animated.View style={styles.button_container}>
-        <TapGestureHandler onHandlerStateChange={onHandlerStateChange}>
-          <Animated.View
-            style={[{ width: CONTAINER_SIZE, height: CONTAINER_SIZE }, style]}
-          >
-            <Svg width={CONTAINER_SIZE} height={CONTAINER_SIZE}>
-              <AnimatedPath animatedProps={animatedProps} />
-            </Svg>
-          </Animated.View>
-        </TapGestureHandler>
-      </Animated.View>
+    <ThemeProvider theme={lightThemeVariables}>
+      <View style={styles.container}>
+        <Post />
+        <Post bg="#FFAF66" />
+        {/* <Animated.View style={styles.button_container}>
+          <TapGestureHandler onHandlerStateChange={onHandlerStateChange}>
+            <Animated.View
+              style={[{ width: CONTAINER_SIZE, height: CONTAINER_SIZE }, style]}
+            >
+              <Svg width={CONTAINER_SIZE} height={CONTAINER_SIZE}>
+                <AnimatedPath animatedProps={animatedProps} />
+              </Svg>
+            </Animated.View>
+          </TapGestureHandler>
+        </Animated.View> */}
 
-      <StatusBar style="auto" />
-    </View>
+        <StatusBar style="auto" />
+      </View>
+    </ThemeProvider>
   );
 }
 
