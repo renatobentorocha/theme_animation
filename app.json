@@ -1,5 +1,6 @@
 {
   "expo": {
+    "entryPoint": "./index.tsx",
     "name": "ThemeAnimation",
     "slug": "ThemeAnimation",
     "version": "1.0.0",

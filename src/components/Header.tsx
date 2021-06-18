@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { StyleSheet, Dimensions } from 'react-native';
 import {
   HandlerStateChangeEvent,
@@ -9,6 +9,7 @@ import Animated, {
   Easing,
   Extrapolate,
   interpolateColor,
+  runOnJS,
   useAnimatedGestureHandler,
   useAnimatedProps,
   useAnimatedStyle,
@@ -17,6 +18,9 @@ import Animated, {
 } from 'react-native-reanimated';
 import { interpolatePath, parse } from 'react-native-redash';
 import Svg, { Path } from 'react-native-svg';
+import { AppContext, ProviderProps } from '../model/provider/AppProvider';
+import { darkThemeVariables } from '../theme/dark';
+import { lightThemeVariables } from '../theme/light';
 import { BaseText, Box } from './Bases';
 
 const { width } = Dimensions.get('screen');
@@ -53,6 +57,9 @@ const p1 = parse(sunPath);
 const p2 = parse(moonPath);
 
 export function Header() {
+  const { handleTheme, theme } = useContext(AppContext);
+
+  console.log({ handleTheme });
   const progress = useSharedValue(0);
   const themeState = useSharedValue<ThemeState>('light');
 
@@ -61,6 +68,16 @@ export function Header() {
   >({
     onEnd: () => {
       themeState.value = themeState.value === 'light' ? 'dark' : 'light';
+      console.log(handleTheme);
+      if (themeState.value === 'dark') {
+        handleTheme
+          ? runOnJS(handleTheme)(darkThemeVariables)
+          : console.log({ theme });
+      } else {
+        handleTheme
+          ? runOnJS(handleTheme)(lightThemeVariables)
+          : console.log({ theme });
+      }
     },
   });
 
