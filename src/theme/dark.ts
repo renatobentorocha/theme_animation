@@ -30,7 +30,7 @@ export const darkThemeVariables: ThemeVariables = {
       quarternary: '#EBEBF52E',
     },
     background: {
-      main: '#000',
+      main: '#000000',
       surface_1: '#161616',
       surface_2: '#1b1b1b',
       stroke: '#3a3a3c',

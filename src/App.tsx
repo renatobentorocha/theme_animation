@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { StyleSheet, ScrollView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
@@ -15,6 +15,7 @@ import { AppContext } from './model/provider/AppProvider';
 
 import Animated, {
   Easing,
+  interpolate,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -24,20 +25,25 @@ const AnimatedBox = Animated.createAnimatedComponent(Box);
 
 export function App() {
   const { theme } = useContext(AppContext);
-  const toValue = useSharedValue(1);
+  const progress = useSharedValue(0.88);
 
-  const styles = useAnimatedStyle(() => {
-    const opacity = withTiming(toValue.value, {
-      duration: 2000,
-      easing: Easing.inOut(Easing.linear),
+  useEffect(() => {
+    progress.value = 0;
+    progress.value = withTiming(1, {
+      duration: 1500,
+      easing: Easing.inOut(Easing.ease),
     });
-
-    return { opacity };
   }, [theme]);
+
+  const style = useAnimatedStyle(() => {
+    console.log(progress.value);
+
+    return { opacity: interpolate(progress.value, [0, 1], [0.6, 1]) };
+  });
 
   return (
     <ThemeProvider theme={theme}>
-      <AnimatedBox bg="background.main" flex={1} style={styles}>
+      <AnimatedBox bg="background.main" flex={1} style={style}>
         <Header />
         <Box mt={20} mb={16} px={16}>
           <SubHeader />

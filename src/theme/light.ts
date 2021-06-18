@@ -30,7 +30,7 @@ export const lightThemeVariables: ThemeVariables = {
       quarternary: '#3C3C432E',
     },
     background: {
-      main: '#fff',
+      main: '#ffffff',
       surface_1: '#fafafa',
       surface_2: '#f5f5f5',
       stroke: '#d1d1d6',

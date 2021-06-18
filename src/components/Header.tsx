@@ -59,7 +59,6 @@ const p2 = parse(moonPath);
 export function Header() {
   const { handleTheme, theme } = useContext(AppContext);
 
-  console.log({ handleTheme });
   const progress = useSharedValue(0);
   const themeState = useSharedValue<ThemeState>('light');
 
