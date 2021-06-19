@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from 'react';
-import { StyleSheet, ScrollView } from 'react-native';
+import { StyleSheet, ScrollView, ViewStyle } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
 import { ThemeProvider } from 'styled-components';
@@ -16,35 +16,67 @@ import { AppContext } from './model/provider/AppProvider';
 import Animated, {
   Easing,
   interpolate,
+  interpolateColor,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+import { lightThemeVariables } from './theme/light';
+import { darkThemeVariables } from './theme/dark';
 
 const AnimatedBox = Animated.createAnimatedComponent(Box);
 
 export function App() {
-  const { theme } = useContext(AppContext);
-  const progress = useSharedValue(0.88);
-
-  useEffect(() => {
-    progress.value = 0;
-    progress.value = withTiming(1, {
-      duration: 1500,
-      easing: Easing.inOut(Easing.ease),
-    });
-  }, [theme]);
+  const { theme, selectedTheme } = useContext(AppContext);
+  const progress = useSharedValue(0);
+  const backgroundColor = useSharedValue<string | number>(
+    lightThemeVariables.colors.background.main,
+  );
 
   const style = useAnimatedStyle(() => {
-    console.log(progress.value);
+    const direction = selectedTheme === 'light' ? 0 : 1;
 
-    return { opacity: interpolate(progress.value, [0, 1], [0.6, 1]) };
+    progress.value = withTiming(direction, {
+      duration: 1500,
+      easing: Easing.inOut(Easing.linear),
+    });
+
+    backgroundColor.value = interpolateColor(
+      progress.value,
+      [0, 1],
+      [
+        lightThemeVariables.colors.background.main,
+        darkThemeVariables.colors.background.main,
+      ],
+    );
+
+    return { backgroundColor: backgroundColor.value };
+  });
+
+  const headerStyle = useAnimatedStyle(() => {
+    const direction = selectedTheme === 'light' ? 0 : 1;
+
+    progress.value = withTiming(direction, {
+      duration: 1500,
+      easing: Easing.inOut(Easing.linear),
+    });
+
+    return {
+      backgroundColor: interpolateColor(
+        progress.value,
+        [0, 1],
+        [
+          lightThemeVariables.colors.background.surface_1,
+          darkThemeVariables.colors.background.surface_1,
+        ],
+      ),
+    };
   });
 
   return (
     <ThemeProvider theme={theme}>
-      <AnimatedBox bg="background.main" flex={1} style={style}>
-        <Header />
+      <AnimatedBox flex={1} style={style}>
+        <Header style={headerStyle} />
         <Box mt={20} mb={16} px={16}>
           <SubHeader />
         </Box>

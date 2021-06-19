@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import { StyleSheet, Dimensions } from 'react-native';
+import React, { useContext, useEffect } from 'react';
+import { StyleSheet, Dimensions, ViewStyle, StyleProp } from 'react-native';
 import {
   HandlerStateChangeEvent,
   TapGestureHandler,
@@ -18,13 +18,14 @@ import Animated, {
 } from 'react-native-reanimated';
 import { interpolatePath, parse } from 'react-native-redash';
 import Svg, { Path } from 'react-native-svg';
-import { AppContext, ProviderProps } from '../model/provider/AppProvider';
+import { AppContext } from '../model/provider/AppProvider';
 import { darkThemeVariables } from '../theme/dark';
 import { lightThemeVariables } from '../theme/light';
 import { BaseText, Box } from './Bases';
 
 const { width } = Dimensions.get('screen');
 const AnimatedPath = Animated.createAnimatedComponent(Path);
+const AnimatedBox = Animated.createAnimatedComponent(Box);
 
 const R = 32.5;
 const MOON_RADIUS = 40;
@@ -33,8 +34,6 @@ const CONTAINER_SIZE = 65;
 const PADDING_HORIZONTAL = 15;
 const TRANSLATE_X_END =
   width - PADDING_HORIZONTAL * 2 - (CONTAINER_SIZE - MOON_RADIUS / 2);
-
-type ThemeState = 'light' | 'dark';
 
 const sunPath = `
     M ${0}, ${R}
@@ -56,29 +55,34 @@ const moonPath = `
 const p1 = parse(sunPath);
 const p2 = parse(moonPath);
 
-export function Header() {
-  const { handleTheme, theme } = useContext(AppContext);
+export function Header({
+  style,
+}: {
+  style: { backgroundColor: string | number };
+}) {
+  const { handleTheme, selectedTheme, handleSelectedTheme } =
+    useContext(AppContext);
 
   const progress = useSharedValue(0);
-  const themeState = useSharedValue<ThemeState>('light');
 
   const onHandlerStateChange = useAnimatedGestureHandler<
     HandlerStateChangeEvent<TapGestureHandlerEventPayload>
   >({
     onEnd: () => {
-      themeState.value = themeState.value === 'light' ? 'dark' : 'light';
-      console.log(handleTheme);
-      if (themeState.value === 'dark') {
-        handleTheme
-          ? runOnJS(handleTheme)(darkThemeVariables)
-          : console.log({ theme });
-      } else {
-        handleTheme
-          ? runOnJS(handleTheme)(lightThemeVariables)
-          : console.log({ theme });
-      }
+      handleSelectedTheme &&
+        runOnJS(handleSelectedTheme)(
+          selectedTheme === 'light' ? 'dark' : 'light',
+        );
     },
   });
+
+  useEffect(() => {
+    if (selectedTheme === 'dark') {
+      handleTheme && handleTheme(darkThemeVariables);
+    } else {
+      handleTheme && handleTheme(lightThemeVariables);
+    }
+  }, [selectedTheme, handleTheme]);
 
   const animatedProps = useAnimatedProps(() => {
     const d = interpolatePath(
@@ -90,14 +94,7 @@ export function Header() {
 
     const fill = interpolateColor(
       progress.value,
-      [
-        0,
-        TRANSLATE_X_END / 4,
-        TRANSLATE_X_END / 3,
-        TRANSLATE_X_END / 2,
-        TRANSLATE_X_END / 2.3,
-        TRANSLATE_X_END,
-      ],
+      [0, 0.33, 0.4999, 0.59999, 0.777, 1],
       ['#FDB813', '#FDB813', '#8d6508', '#473302', '#EBEBF54D', '#EBEBF599'],
     );
 
@@ -107,24 +104,22 @@ export function Header() {
     };
   });
 
-  const style = useAnimatedStyle(() => {
-    const direction = themeState.value === 'light' ? 0 : TRANSLATE_X_END;
+  useEffect(() => {
+    const direction = selectedTheme === 'light' ? 0 : TRANSLATE_X_END;
 
     progress.value = withTiming(direction, {
       duration: 1500,
       easing: Easing.inOut(Easing.linear),
     });
+  }, [selectedTheme]);
 
-    return {};
-    return { transform: [{ translateX: progress.value }] };
-  });
   return (
-    <Box
+    <AnimatedBox
       width="100%"
       height={140}
       justifyContent="flex-end"
       px={16}
-      bg="background.surface_1"
+      style={style}
     >
       <Box style={styles.button_container}>
         <TapGestureHandler onHandlerStateChange={onHandlerStateChange}>
@@ -134,7 +129,6 @@ export function Header() {
                 width: CONTAINER_SIZE,
                 height: CONTAINER_SIZE,
               },
-              style,
             ]}
           >
             <Svg width={CONTAINER_SIZE} height={CONTAINER_SIZE}>
@@ -151,7 +145,7 @@ export function Header() {
       >
         Home
       </BaseText>
-    </Box>
+    </AnimatedBox>
   );
 }
 
