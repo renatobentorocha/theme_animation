@@ -1,10 +1,12 @@
 import React, { useContext, useEffect } from 'react';
 import { StyleSheet, Dimensions, ViewStyle, StyleProp } from 'react-native';
+
 import {
   HandlerStateChangeEvent,
   TapGestureHandler,
   TapGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
+
 import Animated, {
   Easing,
   Extrapolate,
@@ -12,10 +14,10 @@ import Animated, {
   runOnJS,
   useAnimatedGestureHandler,
   useAnimatedProps,
-  useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+
 import { interpolatePath, parse } from 'react-native-redash';
 import Svg, { Path } from 'react-native-svg';
 import { AppContext } from '../model/provider/AppProvider';
@@ -58,7 +60,7 @@ const p2 = parse(moonPath);
 export function Header({
   style,
 }: {
-  style: { backgroundColor: string | number };
+  style?: StyleProp<Animated.AnimateStyle<StyleProp<ViewStyle>>>;
 }) {
   const { handleTheme, selectedTheme, handleSelectedTheme } =
     useContext(AppContext);
@@ -94,7 +96,14 @@ export function Header({
 
     const fill = interpolateColor(
       progress.value,
-      [0, 0.33, 0.4999, 0.59999, 0.777, 1],
+      [
+        0,
+        TRANSLATE_X_END / 4,
+        TRANSLATE_X_END / 3,
+        TRANSLATE_X_END / 2,
+        TRANSLATE_X_END / 2.3,
+        TRANSLATE_X_END,
+      ],
       ['#FDB813', '#FDB813', '#8d6508', '#473302', '#EBEBF54D', '#EBEBF599'],
     );
 
@@ -108,7 +117,7 @@ export function Header({
     const direction = selectedTheme === 'light' ? 0 : TRANSLATE_X_END;
 
     progress.value = withTiming(direction, {
-      duration: 1500,
+      duration: 1300,
       easing: Easing.inOut(Easing.linear),
     });
   }, [selectedTheme]);

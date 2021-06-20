@@ -1,5 +1,5 @@
-import React, { useContext, useEffect } from 'react';
-import { StyleSheet, ScrollView, ViewStyle } from 'react-native';
+import React, { useContext } from 'react';
+import { StyleSheet, ScrollView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
 import { ThemeProvider } from 'styled-components';
@@ -15,12 +15,12 @@ import { AppContext } from './model/provider/AppProvider';
 
 import Animated, {
   Easing,
-  interpolate,
   interpolateColor,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+
 import { lightThemeVariables } from './theme/light';
 import { darkThemeVariables } from './theme/dark';
 
@@ -57,7 +57,7 @@ export function App() {
     const direction = selectedTheme === 'light' ? 0 : 1;
 
     progress.value = withTiming(direction, {
-      duration: 1500,
+      duration: 1300,
       easing: Easing.inOut(Easing.linear),
     });
 
